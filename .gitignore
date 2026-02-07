@@ -400,3 +400,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 src/cm.api/appsettings.Development.json
+doc/.$ERD Base .drawio.bkp
