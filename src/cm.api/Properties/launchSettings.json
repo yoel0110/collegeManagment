@@ -1,5 +1,5 @@
 {
-    {
+    "profiles":{
         "https": {
             "applicationUrl": "https://localhost:7273",
             "commandName": "Project",
