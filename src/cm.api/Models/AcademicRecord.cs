@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace cm.api.Models
 {
     public class AcademicRecord
     {
+        [Key]
         public int RecordID { get; set; }
         [NotNull, Required]
         public int StudentID { get; set; }
@@ -14,6 +16,6 @@ namespace cm.api.Models
         public DateOnly YearEnrrollMent { get; set; }
         public int CurrentPeriod { get; set; }
         public float Average { get; set; }
-        public string State { get; set; }
+        public string State { get;set; }
     }
 }

@@ -1,11 +1,16 @@
-﻿namespace cm.api.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+
+namespace cm.api.Models
 {
     public class CatalogCourse
     {
-        public int SubjectID { get; set; }
+        [Key]
+        public int SubjectId { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
         public float Score { get; set; }
+        [NotNull, Required]
         public int ProfessorID { get; set; }
     }
 }
