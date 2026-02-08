@@ -1,3 +1,6 @@
+using cm.api.Context;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +10,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var config = builder.Configuration.GetConnectionString("SqlServer");
+
+builder.Services.AddDbContext<AppDbContext>((context) => context.UseSqlServer(config));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -15,7 +22,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+ 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
