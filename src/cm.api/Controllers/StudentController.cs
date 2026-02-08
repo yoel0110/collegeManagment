@@ -52,5 +52,14 @@ namespace cm.api.Controllers
 
             return Ok();
         }
+        [HttpGet]
+        public async Task<ActionResult<List<Student>>> GetAll()
+        {
+            var students = await _context.Students
+                                            .Include(s => s.AcademicRecord)
+                                            .ToListAsync();
+            return Ok(students);
+        }
+
     }
 }
