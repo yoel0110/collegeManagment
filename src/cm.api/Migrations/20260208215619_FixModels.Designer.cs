@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cm.api.Context;
 
@@ -11,9 +12,11 @@ using cm.api.Context;
 namespace cm.api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260208215619_FixModels")]
+    partial class FixModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,6 +215,9 @@ namespace cm.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentID"));
 
+                    b.Property<int?>("AcademicRecordRecordID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Adress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -248,7 +254,7 @@ namespace cm.api.Migrations
 
                     b.HasKey("StudentID");
 
-                    b.HasIndex("RecordId");
+                    b.HasIndex("AcademicRecordRecordID");
 
                     b.ToTable("Students");
                 });
@@ -307,9 +313,7 @@ namespace cm.api.Migrations
                 {
                     b.HasOne("cm.api.Models.AcademicRecord", "AcademicRecord")
                         .WithMany()
-                        .HasForeignKey("RecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AcademicRecordRecordID");
 
                     b.Navigation("AcademicRecord");
                 });
