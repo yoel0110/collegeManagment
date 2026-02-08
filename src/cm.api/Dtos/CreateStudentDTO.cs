@@ -1,13 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using cm.api.Models;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace cm.api.Models
+namespace cm.api.Dtos
 {
-    public class Student
+    public class CreateStudentDTO
     {
-        [Key]
-        public int StudentID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateOnly BirthDate { get; set; }
@@ -16,8 +14,7 @@ namespace cm.api.Models
         public string PhoneNumber { get; set; }
         public string Adress { get; set; }
         public string Nationality { get; set; }
-        [ForeignKey(nameof(AcademicRecord))]
-        public int RecordId { get; set; }
-        public AcademicRecord? AcademicRecord { get; set; }
+        [Required]
+        public CreateAcademicRecordDTO AcademicRecord { get; set; }
     }
 }

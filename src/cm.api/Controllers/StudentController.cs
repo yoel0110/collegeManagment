@@ -1,0 +1,56 @@
+﻿using cm.api.Context;
+using cm.api.Dtos;
+using cm.api.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace cm.api.Controllers
+{
+    [ApiController]
+    [Route("api/v1/student")]
+    public class StudentController: ControllerBase
+    {
+        private readonly AppDbContext _context;
+
+        public StudentController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateStudent(CreateStudentDTO studentDTO)
+        {
+            if (studentDTO.AcademicRecord == null) return BadRequest("Record can't be empty");
+
+            string matricula = "M-" + DateTime.Now.Year + "" + DateTime.Now.Day + "" + ((await _context.Students.CountAsync()) + 1);
+            
+            var record = _context.AcademicRecords.Add(new AcademicRecord
+            {
+                Average = 0.0,
+                Carreer = studentDTO.AcademicRecord.Carreer,
+                CurrentPeriod = 0,
+                Matricula = matricula,
+                FacultyId = studentDTO.AcademicRecord.FacultyId,
+                State = "Admitido",
+                YearEnrrollMent = DateOnly.FromDateTime(DateTime.Now),
+            });
+            await _context.SaveChangesAsync();
+
+            _context.Students.Add(new Student
+            {
+                FirstName = studentDTO.FirstName,
+                BirthDate = studentDTO.BirthDate,
+                PhoneNumber = studentDTO.PhoneNumber,
+                Adress = studentDTO.Adress,
+                LastName = studentDTO.LastName,
+                Email = studentDTO.Email,
+                Gender = studentDTO.Gender,
+                Nationality = studentDTO.Nationality,
+                RecordId = record.Entity.RecordID,
+            });
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+    }
+}
