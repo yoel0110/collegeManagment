@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace cm.api.Controllers
 {
     [ApiController]
-    [Route("api/v1/student")]
+    [Route("api/v1/students")]
     public class StudentController: ControllerBase
     {
         private readonly AppDbContext _context;
@@ -35,7 +35,7 @@ namespace cm.api.Controllers
             });
             await _context.SaveChangesAsync();
 
-            _context.Students.Add(new Student
+            var student =  _context.Students.Add(new Student
             {
                 FirstName = studentDTO.FirstName,
                 BirthDate = studentDTO.BirthDate,
@@ -114,17 +114,29 @@ namespace cm.api.Controllers
 
             if (student == null) return NoContent();
             _context.Students.Remove(student);
+            _context.AcademicRecords.Remove(student.AcademicRecord);
             await _context.SaveChangesAsync(); 
 
             return Ok($"The record matricula {student.AcademicRecord.Matricula} have been removed");
         }
-        [HttpGet("record/{matricula}")]
+        [HttpGet("records/{matricula}")]
         public async Task<ActionResult<AcademicRecord>> GetRecord(string matricula)
         {
             var record = await _context.AcademicRecords.FirstOrDefaultAsync(r =>r.Matricula == matricula);
                      
             if (record == null) return NoContent();
 
+            return Ok(record);
+        }
+
+        [HttpPut("update-status")]
+        public async Task<ActionResult<AcademicRecord>> UpdateState(UpdateStateStudentStateDTO update)
+        {
+            AcademicRecord? record = await _context.AcademicRecords.
+                    FirstOrDefaultAsync(r => r.Matricula == update.matricula);
+            if (record == null) return NotFound();
+            record.State = update.State;
+            await _context.SaveChangesAsync();
             return Ok(record);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace cm.api.Models
@@ -14,5 +15,6 @@ namespace cm.api.Models
         public int CurrentPeriod { get; set; }
         public double Average { get; set; }
         public string State { get;set; }
+ 
     }
 }

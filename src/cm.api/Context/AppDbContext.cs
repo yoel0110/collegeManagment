@@ -23,6 +23,7 @@ namespace cm.api.Context
             modelBuilder.Entity<AcademicRecord>()
                 .Property(p => p.RecordID)
                 .ValueGeneratedOnAdd();
+                    
         }
     }
 }
