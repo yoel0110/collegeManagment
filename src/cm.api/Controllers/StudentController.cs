@@ -106,5 +106,29 @@ namespace cm.api.Controllers
             }
             return NotFound();
         }
+        
+        [HttpDelete("{matricula}")]
+        public async Task<ActionResult<Student>> DeleteByMatricula(string matricula)
+        {
+            var student = await _context.Students
+                    .Include(s => s.AcademicRecord)
+                    .FirstOrDefaultAsync(s => s.AcademicRecord.Matricula == matricula);
+
+            if (student == null) return NoContent();
+            _context.Students.Remove(student);
+            await _context.SaveChangesAsync(); 
+
+            return Ok($"The record matricula {student.AcademicRecord.Matricula} have been removed");
+        }
+
+        [HttpGet("record/{matricula}")]
+        public async Task<ActionResult<AcademicRecord>> GetRecord(string matricula)
+        {
+            var record = await _context.AcademicRecords.FirstOrDefaultAsync(r =>r.Matricula == matricula);
+                     
+            if (record == null) return NoContent();
+
+            return Ok(record);
+        }
     }
 }
