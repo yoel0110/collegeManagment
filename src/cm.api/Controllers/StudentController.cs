@@ -74,6 +74,19 @@ namespace cm.api.Controllers
             return Ok(student);
         }
 
+        [HttpGet("get-with-matricula/{matricula}")]
+        public async Task<ActionResult<Student>> GetByMatricula(string matricula)
+        {
+            var student = await _context.Students
+                    .Include(s => s.AcademicRecord)
+                    .FirstOrDefaultAsync(s => s.AcademicRecord.Matricula == matricula);
+
+
+            if (student == null) return NoContent();
+
+            return Ok(student);
+        }
+
         [HttpPut]
         public async Task<ActionResult<Student>> Update(UpdateStudentDTO updateStudentDTO)
         {
