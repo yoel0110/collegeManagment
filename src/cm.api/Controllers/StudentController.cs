@@ -60,6 +60,20 @@ namespace cm.api.Controllers
                                             .ToListAsync();
             return Ok(students);
         }
+
+        [HttpGet("get-withid/{id}")]
+        public async Task<ActionResult<Student>> GetById(int id)
+        {
+            var student = await _context.Students
+                    .Include(s => s.AcademicRecord)
+                    .FirstOrDefaultAsync(s => s.StudentID == id);
+                                            
+
+            if (student == null) return NoContent();
+
+            return Ok(student);
+        }
+
         [HttpPut]
         public async Task<ActionResult<Student>> Update(UpdateStudentDTO updateStudentDTO)
         {
