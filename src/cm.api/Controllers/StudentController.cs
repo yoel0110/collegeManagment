@@ -16,7 +16,6 @@ namespace cm.api.Controllers
         {
             _context = context;
         }
-
         [HttpPost]
         public async Task<IActionResult> CreateStudent(CreateStudentDTO studentDTO)
         {
@@ -61,7 +60,7 @@ namespace cm.api.Controllers
             return Ok(students);
         }
 
-        [HttpGet("get-withid/{id}")]
+        [HttpGet("get-with-id/{id}")]
         public async Task<ActionResult<Student>> GetById(int id)
         {
             var student = await _context.Students
@@ -86,7 +85,6 @@ namespace cm.api.Controllers
 
             return Ok(student);
         }
-
         [HttpPut]
         public async Task<ActionResult<Student>> Update(UpdateStudentDTO updateStudentDTO)
         {
@@ -120,7 +118,6 @@ namespace cm.api.Controllers
 
             return Ok($"The record matricula {student.AcademicRecord.Matricula} have been removed");
         }
-
         [HttpGet("record/{matricula}")]
         public async Task<ActionResult<AcademicRecord>> GetRecord(string matricula)
         {
