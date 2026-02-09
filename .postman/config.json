@@ -1,0 +1,15 @@
+{
+  "workspace": {
+    "id": "73b5742c-e776-4400-88e4-c6ba555fbf9e"
+  },
+  "entities": {
+    "environments": [],
+    "flows": [],
+    "globals": [],
+    "mocks": [],
+    "specs": [
+      "..\\src\\cm.api\\obj\\Debug\\net8.0\\EndpointInfo\\cm.api.json"
+    ],
+    "collections": []
+  }
+}
