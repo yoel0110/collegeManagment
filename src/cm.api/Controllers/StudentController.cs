@@ -60,6 +60,24 @@ namespace cm.api.Controllers
                                             .ToListAsync();
             return Ok(students);
         }
-
+        [HttpPut]
+        public async Task<ActionResult<Student>> Update(UpdateStudentDTO updateStudentDTO)
+        {
+            Student? student = await _context.Students.FindAsync(updateStudentDTO.StudentID);
+            if (student != null)
+            {
+                student.FirstName = updateStudentDTO.FirstName;
+                student.LastName = updateStudentDTO.LastName;
+                student.BirthDate = updateStudentDTO.BirthDate;
+                student.Email = updateStudentDTO.Email;
+                student.PhoneNumber = updateStudentDTO.PhoneNumber;
+                student.Adress = updateStudentDTO.Adress;
+                student.Gender = updateStudentDTO.Gender;
+                student.Nationality = updateStudentDTO.Nationality;
+                await _context.SaveChangesAsync();
+                return Ok(student);
+            }
+            return NotFound();
+        }
     }
 }
