@@ -1,5 +1,6 @@
 ﻿using cm.api.Context;
 using cm.api.Dtos;
+using cm.api.Dtos.student;
 using cm.api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,15 +50,15 @@ namespace cm.api.Controllers
             });
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return StatusCode(200);
         }
         [HttpGet]
-        public async Task<ActionResult<List<Student>>> GetAll()
+        public async Task<ActionResult<ApiResponse<Student>>> GetAll()
         {
             var students = await _context.Students
                                             .Include(s => s.AcademicRecord)
                                             .ToListAsync();
-            return Ok(students);
+            return StatusCode(200, ApiResponse<List<Student>>.SuccessResponse(students, "Ok", 200));
         }
 
         [HttpGet("get-with-id/{id}")]
@@ -70,7 +71,7 @@ namespace cm.api.Controllers
 
             if (student == null) return NoContent();
 
-            return Ok(student);
+            return StatusCode(200,ApiResponse<Student>.SuccessResponse(student));
         }
 
         [HttpGet("get-with-matricula/{matricula}")]
@@ -83,7 +84,7 @@ namespace cm.api.Controllers
 
             if (student == null) return NoContent();
 
-            return Ok(student);
+            return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
         }
         [HttpPut]
         public async Task<ActionResult<Student>> Update(UpdateStudentDTO updateStudentDTO)
@@ -102,7 +103,7 @@ namespace cm.api.Controllers
                 await _context.SaveChangesAsync();
                 return Ok(student);
             }
-            return NotFound();
+            return StatusCode(404, ApiResponse<Student>.SuccessResponse(student, statusCode: 200));
         }
         
         [HttpDelete("{matricula}")]
@@ -112,21 +113,21 @@ namespace cm.api.Controllers
                     .Include(s => s.AcademicRecord)
                     .FirstOrDefaultAsync(s => s.AcademicRecord.Matricula == matricula);
 
-            if (student == null) return NoContent();
+            if (student == null) return StatusCode(404, ApiResponse<Student>.UnSuccessFullResponse("Student not found"));
             _context.Students.Remove(student);
             _context.AcademicRecords.Remove(student.AcademicRecord);
             await _context.SaveChangesAsync(); 
 
-            return Ok($"The record matricula {student.AcademicRecord.Matricula} have been removed");
+            return StatusCode(410, ApiResponse<Student>.SuccessResponse(null,$"The record matricula {student.AcademicRecord.Matricula} have been removed", 410));
         }
         [HttpGet("records/{matricula}")]
         public async Task<ActionResult<AcademicRecord>> GetRecord(string matricula)
         {
             var record = await _context.AcademicRecords.FirstOrDefaultAsync(r =>r.Matricula == matricula);
-                     
-            if (record == null) return NoContent();
 
-            return Ok(record);
+            if (record == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse(statusCode: 404));
+
+            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(record));
         }
 
         [HttpPut("update-status")]
@@ -137,7 +138,7 @@ namespace cm.api.Controllers
             if (record == null) return NotFound();
             record.State = update.State;
             await _context.SaveChangesAsync();
-            return Ok(record);
+            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(record));
         }
     }
 }
