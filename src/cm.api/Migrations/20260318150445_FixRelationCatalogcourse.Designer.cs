@@ -12,8 +12,8 @@ using cm.api.Context;
 namespace cm.api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260209182757_FixModelsRelatiosStudentandRecord")]
-    partial class FixModelsRelatiosStudentandRecord
+    [Migration("20260318150445_FixRelationCatalogcourse")]
+    partial class FixRelationCatalogcourse
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,9 +53,6 @@ namespace cm.api.Migrations
                     b.Property<string>("State")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
 
                     b.Property<DateOnly>("YearEnrrollMent")
                         .HasColumnType("date");
@@ -103,9 +100,8 @@ namespace cm.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeparmentId"));
 
-                    b.Property<string>("FacultyId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -156,8 +152,11 @@ namespace cm.api.Migrations
 
             modelBuilder.Entity("cm.api.Models.Faculty", b =>
                 {
-                    b.Property<string>("FacultyID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("FacultyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FacultyID"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -254,8 +253,7 @@ namespace cm.api.Migrations
 
                     b.HasKey("StudentID");
 
-                    b.HasIndex("RecordId")
-                        .IsUnique();
+                    b.HasIndex("RecordId");
 
                     b.ToTable("Students");
                 });
@@ -313,17 +311,12 @@ namespace cm.api.Migrations
             modelBuilder.Entity("cm.api.Models.Student", b =>
                 {
                     b.HasOne("cm.api.Models.AcademicRecord", "AcademicRecord")
-                        .WithOne("Student")
-                        .HasForeignKey("cm.api.Models.Student", "RecordId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .WithMany()
+                        .HasForeignKey("RecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AcademicRecord");
-                });
-
-            modelBuilder.Entity("cm.api.Models.AcademicRecord", b =>
-                {
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("cm.api.Models.Professor", b =>

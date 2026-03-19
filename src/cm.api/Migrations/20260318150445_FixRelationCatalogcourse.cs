@@ -6,16 +6,36 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace cm.api.Migrations
 {
     /// <inheritdoc />
-    public partial class InstialMigration : Migration
+    public partial class FixRelationCatalogcourse : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "AcademicRecords",
+                columns: table => new
+                {
+                    RecordID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Matricula = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Carreer = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FacultyId = table.Column<int>(type: "int", nullable: false),
+                    YearEnrrollMent = table.Column<DateOnly>(type: "date", nullable: false),
+                    CurrentPeriod = table.Column<int>(type: "int", nullable: false),
+                    Average = table.Column<double>(type: "float", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AcademicRecords", x => x.RecordID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Faculties",
                 columns: table => new
                 {
-                    FacultyID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FacultyID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -42,6 +62,12 @@ namespace cm.api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Students", x => x.StudentID);
+                    table.ForeignKey(
+                        name: "FK_Students_AcademicRecords_RecordId",
+                        column: x => x.RecordId,
+                        principalTable: "AcademicRecords",
+                        principalColumn: "RecordID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -51,7 +77,7 @@ namespace cm.api.Migrations
                     DeparmentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FacultyId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    FacultyId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -61,32 +87,6 @@ namespace cm.api.Migrations
                         column: x => x.FacultyId,
                         principalTable: "Faculties",
                         principalColumn: "FacultyID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AcademicRecords",
-                columns: table => new
-                {
-                    RecordID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StudentID = table.Column<int>(type: "int", nullable: false),
-                    Matricula = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Carreer = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FacultyId = table.Column<int>(type: "int", nullable: false),
-                    YearEnrrollMent = table.Column<DateOnly>(type: "date", nullable: false),
-                    CurrentPeriod = table.Column<int>(type: "int", nullable: false),
-                    Average = table.Column<float>(type: "real", nullable: false),
-                    State = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AcademicRecords", x => x.RecordID);
-                    table.ForeignKey(
-                        name: "FK_AcademicRecords_Students_StudentID",
-                        column: x => x.StudentID,
-                        principalTable: "Students",
-                        principalColumn: "StudentID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -168,12 +168,6 @@ namespace cm.api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AcademicRecords_StudentID",
-                table: "AcademicRecords",
-                column: "StudentID",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CatalogCourses_ProfessorID",
                 table: "CatalogCourses",
                 column: "ProfessorID",
@@ -198,6 +192,11 @@ namespace cm.api.Migrations
                 name: "IX_Professors_DepartmentDeparmentId",
                 table: "Professors",
                 column: "DepartmentDeparmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_RecordId",
+                table: "Students",
+                column: "RecordId");
         }
 
         /// <inheritdoc />
@@ -207,13 +206,13 @@ namespace cm.api.Migrations
                 name: "Enrollments");
 
             migrationBuilder.DropTable(
-                name: "AcademicRecords");
+                name: "Students");
 
             migrationBuilder.DropTable(
                 name: "CatalogCourses");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "AcademicRecords");
 
             migrationBuilder.DropTable(
                 name: "Professors");

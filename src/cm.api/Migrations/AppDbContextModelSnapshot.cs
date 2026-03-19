@@ -75,16 +75,10 @@ namespace cm.api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProfessorID")
-                        .HasColumnType("int");
-
                     b.Property<float>("Score")
                         .HasColumnType("real");
 
                     b.HasKey("SubjectId");
-
-                    b.HasIndex("ProfessorID")
-                        .IsUnique();
 
                     b.ToTable("CatalogCourses");
                 });
@@ -97,9 +91,8 @@ namespace cm.api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeparmentId"));
 
-                    b.Property<string>("FacultyId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -150,8 +143,11 @@ namespace cm.api.Migrations
 
             modelBuilder.Entity("cm.api.Models.Faculty", b =>
                 {
-                    b.Property<string>("FacultyID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("FacultyID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FacultyID"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -169,6 +165,9 @@ namespace cm.api.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfessorID"));
+
+                    b.Property<int>("CatalogCourseSubjectId")
+                        .HasColumnType("int");
 
                     b.Property<int>("DepartmentDeparmentId")
                         .HasColumnType("int");
@@ -198,6 +197,8 @@ namespace cm.api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProfessorID");
+
+                    b.HasIndex("CatalogCourseSubjectId");
 
                     b.HasIndex("DepartmentDeparmentId");
 
@@ -253,15 +254,6 @@ namespace cm.api.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("cm.api.Models.CatalogCourse", b =>
-                {
-                    b.HasOne("cm.api.Models.Professor", null)
-                        .WithOne("CatalogCourse")
-                        .HasForeignKey("cm.api.Models.CatalogCourse", "ProfessorID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("cm.api.Models.Department", b =>
                 {
                     b.HasOne("cm.api.Models.Faculty", "Faculty")
@@ -294,11 +286,19 @@ namespace cm.api.Migrations
 
             modelBuilder.Entity("cm.api.Models.Professor", b =>
                 {
+                    b.HasOne("cm.api.Models.CatalogCourse", "CatalogCourse")
+                        .WithMany()
+                        .HasForeignKey("CatalogCourseSubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("cm.api.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentDeparmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CatalogCourse");
 
                     b.Navigation("Department");
                 });
@@ -312,12 +312,6 @@ namespace cm.api.Migrations
                         .IsRequired();
 
                     b.Navigation("AcademicRecord");
-                });
-
-            modelBuilder.Entity("cm.api.Models.Professor", b =>
-                {
-                    b.Navigation("CatalogCourse")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
