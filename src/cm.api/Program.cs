@@ -1,4 +1,6 @@
-using cm.api.Context;
+using cm.Infrastructure.Context;
+using cm.Infrastructure.Interfaces;
+using cm.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,9 @@ builder.Services.AddSwaggerGen();
 var config = builder.Configuration.GetConnectionString("connection");
 
 builder.Services.AddDbContext<AppDbContext>((context) => context.UseSqlServer(config));
+builder.Services.AddTransient<IStudentRepository, StudentRepository>();
+builder.Services.AddTransient<IAcedemicRecordRepository, AcedemicRecordRepository>();
+
 
 var app = builder.Build();
 

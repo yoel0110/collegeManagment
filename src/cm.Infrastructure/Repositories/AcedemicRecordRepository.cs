@@ -43,8 +43,26 @@ namespace cm.Infrastructure.Repositories
             return record;
         }
 
+        public AcademicRecord GetByMatricula(string matricula)
+        {
+            var record = _context.AcademicRecords.FirstOrDefault(r => r.Matricula == matricula);
+            return record ?? null;
+        }
+
         public AcademicRecord Update(AcademicRecord record)
         {
+            _context.AcademicRecords.Update(record);
+            _context.SaveChanges();
+
+            return record;
+        }
+
+        public AcademicRecord UpdateState(string matricula, string state)
+        {
+            var record = _context.AcademicRecords.FirstOrDefault(r => r.Matricula == matricula);
+            if (record == null) return null;
+
+            record.State = state;
             _context.AcademicRecords.Update(record);
             _context.SaveChanges();
 

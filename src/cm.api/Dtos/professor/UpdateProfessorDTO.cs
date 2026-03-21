@@ -1,4 +1,4 @@
-﻿using cm.api.Models;
+﻿using cm.Domain.Entities;
 
 namespace cm.api.Dtos.professor
 {

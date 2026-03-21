@@ -1,5 +1,4 @@
-﻿using cm.api.Models;
-
+﻿
 namespace cm.api.Dtos.professor
 {
     public class CreateProfessorDTO

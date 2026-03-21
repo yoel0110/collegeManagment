@@ -1,7 +1,4 @@
-﻿using cm.api.Dtos.faculty;
-using cm.api.Models;
-
-namespace cm.api.Dtos.department
+﻿namespace cm.api.Dtos.department
 {
     public class CreateDeparmentDTO
     {
