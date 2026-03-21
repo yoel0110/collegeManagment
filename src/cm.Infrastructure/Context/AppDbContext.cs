@@ -1,4 +1,5 @@
 ﻿using cm.Domain.Entities;
+using cm.Infrastructure.ModelsConfigution;
 using Microsoft.EntityFrameworkCore;
 
 namespace cm.Infrastructure.Context
@@ -20,10 +21,14 @@ namespace cm.Infrastructure.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AcademicRecord>()
-                .Property(p => p.RecordID)
-                .ValueGeneratedOnAdd();
-                    
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration<AcademicRecord>(new AcademicRecordConfiguration());
+            modelBuilder.ApplyConfiguration<CatalogCourse>(new CatalogCourseConfiguration()); 
+            modelBuilder.ApplyConfiguration<Department>(new DepartmentConfiguration());
+            modelBuilder.ApplyConfiguration<Enrollment>(new EnrollmentConfiguration());
+            modelBuilder.ApplyConfiguration<Faculty>(new  FacultyConfiguration());
+            modelBuilder.ApplyConfiguration<Professor>(new ProfessorConfiguration());
+            modelBuilder.ApplyConfiguration<Student>(new StudentConfiguration());
         }
     }
 }

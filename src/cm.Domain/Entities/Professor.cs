@@ -1,10 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace cm.Domain.Entities
+﻿namespace cm.Domain.Entities
 {
     public class Professor
     {
-        [Key]
         public int ProfessorID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -13,6 +10,7 @@ namespace cm.Domain.Entities
         public Department Department { get; set; }
         public string Specialty { get; set; }
         public string Status { get; set; }
-        public CatalogCourse CatalogCourse { get; set; }
+        public int DepartmentId { get; set; }
+        public ICollection<CatalogCourse> CatalogCourse { get; set; }
     }
 }

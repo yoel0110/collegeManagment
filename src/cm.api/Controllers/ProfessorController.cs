@@ -47,7 +47,7 @@ namespace cm.api.Controllers
                 Specialty = dto.Specialty,
                 Status = dto.Status,
                 Department = department,
-                CatalogCourse = catalog
+                CatalogCourse = new List<CatalogCourse> { catalog }
             };
 
             professor = _profesorRepository.Add(professor);

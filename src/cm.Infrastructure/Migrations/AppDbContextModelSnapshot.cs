@@ -51,10 +51,16 @@ namespace cm.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("YearEnrrollMent")
                         .HasColumnType("date");
 
                     b.HasKey("RecordID");
+
+                    b.HasIndex("StudentId")
+                        .IsUnique();
 
                     b.ToTable("AcademicRecords");
                 });
@@ -71,14 +77,24 @@ namespace cm.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EnrollmentID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProfesorId")
+                        .HasColumnType("int");
 
                     b.Property<float>("Score")
                         .HasColumnType("real");
 
                     b.HasKey("SubjectId");
+
+                    b.HasIndex("EnrollmentID");
+
+                    b.HasIndex("ProfesorId");
 
                     b.ToTable("CatalogCourses");
                 });
@@ -113,12 +129,6 @@ namespace cm.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EnrollMentID"));
 
-                    b.Property<int>("AcademicRecordRecordID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CatalogCourseSubjectId")
-                        .HasColumnType("int");
-
                     b.Property<DateOnly>("EnrollDate")
                         .HasColumnType("date");
 
@@ -134,9 +144,7 @@ namespace cm.Infrastructure.Migrations
 
                     b.HasKey("EnrollMentID");
 
-                    b.HasIndex("AcademicRecordRecordID");
-
-                    b.HasIndex("CatalogCourseSubjectId");
+                    b.HasIndex("RecordID");
 
                     b.ToTable("Enrollments");
                 });
@@ -166,10 +174,7 @@ namespace cm.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfessorID"));
 
-                    b.Property<int>("CatalogCourseSubjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DepartmentDeparmentId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -198,9 +203,7 @@ namespace cm.Infrastructure.Migrations
 
                     b.HasKey("ProfessorID");
 
-                    b.HasIndex("CatalogCourseSubjectId");
-
-                    b.HasIndex("DepartmentDeparmentId");
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Professors");
                 });
@@ -249,15 +252,43 @@ namespace cm.Infrastructure.Migrations
 
                     b.HasKey("StudentID");
 
-                    b.HasIndex("RecordId");
-
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("cm.Domain.Entities.AcademicRecord", b =>
+                {
+                    b.HasOne("cm.Domain.Entities.Student", "Student")
+                        .WithOne("AcademicRecord")
+                        .HasForeignKey("cm.Domain.Entities.AcademicRecord", "StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("cm.Domain.Entities.CatalogCourse", b =>
+                {
+                    b.HasOne("cm.Domain.Entities.Enrollment", "Enrollment")
+                        .WithMany("CatalogCourse")
+                        .HasForeignKey("EnrollmentID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("cm.Domain.Entities.Professor", "Professor")
+                        .WithMany("CatalogCourse")
+                        .HasForeignKey("ProfesorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Enrollment");
+
+                    b.Navigation("Professor");
                 });
 
             modelBuilder.Entity("cm.Domain.Entities.Department", b =>
                 {
                     b.HasOne("cm.Domain.Entities.Faculty", "Faculty")
-                        .WithMany()
+                        .WithMany("Department")
                         .HasForeignKey("FacultyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -268,49 +299,52 @@ namespace cm.Infrastructure.Migrations
             modelBuilder.Entity("cm.Domain.Entities.Enrollment", b =>
                 {
                     b.HasOne("cm.Domain.Entities.AcademicRecord", "AcademicRecord")
-                        .WithMany()
-                        .HasForeignKey("AcademicRecordRecordID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("cm.Domain.Entities.CatalogCourse", "CatalogCourse")
-                        .WithMany()
-                        .HasForeignKey("CatalogCourseSubjectId")
+                        .WithMany("Enrollment")
+                        .HasForeignKey("RecordID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AcademicRecord");
-
-                    b.Navigation("CatalogCourse");
                 });
 
             modelBuilder.Entity("cm.Domain.Entities.Professor", b =>
                 {
-                    b.HasOne("cm.Domain.Entities.CatalogCourse", "CatalogCourse")
-                        .WithMany()
-                        .HasForeignKey("CatalogCourseSubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("cm.Domain.Entities.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentDeparmentId")
+                        .WithMany("Professors")
+                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CatalogCourse");
 
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("cm.Domain.Entities.AcademicRecord", b =>
+                {
+                    b.Navigation("Enrollment");
+                });
+
+            modelBuilder.Entity("cm.Domain.Entities.Department", b =>
+                {
+                    b.Navigation("Professors");
+                });
+
+            modelBuilder.Entity("cm.Domain.Entities.Enrollment", b =>
+                {
+                    b.Navigation("CatalogCourse");
+                });
+
+            modelBuilder.Entity("cm.Domain.Entities.Faculty", b =>
+                {
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("cm.Domain.Entities.Professor", b =>
+                {
+                    b.Navigation("CatalogCourse");
+                });
+
             modelBuilder.Entity("cm.Domain.Entities.Student", b =>
                 {
-                    b.HasOne("cm.Domain.Entities.AcademicRecord", "AcademicRecord")
-                        .WithMany()
-                        .HasForeignKey("RecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("AcademicRecord");
                 });
 #pragma warning restore 612, 618

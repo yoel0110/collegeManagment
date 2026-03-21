@@ -4,10 +4,13 @@ namespace cm.Domain.Entities
 {
     public class CatalogCourse
     {
-        [Key]
         public int SubjectId { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
         public float Score { get; set; }
+        public int EnrollmentID { get; set; }
+        public int ProfesorId { get; set; }    
+        public Professor Professor { get; set; }
+        public Enrollment Enrollment { get; set; }
     }
 }
