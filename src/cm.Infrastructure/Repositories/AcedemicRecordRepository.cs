@@ -23,6 +23,7 @@ namespace cm.Infrastructure.Repositories
             record.State = "Canceled";
             _context.AcademicRecords.Update(record);
             _context.SaveChanges();
+            _context.Entry(record).Reload();
             return record;
         }
 
@@ -53,7 +54,7 @@ namespace cm.Infrastructure.Repositories
         {
             _context.AcademicRecords.Update(record);
             _context.SaveChanges();
-
+            _context.Entry(record).Reload();
             return record;
         }
 
@@ -65,7 +66,6 @@ namespace cm.Infrastructure.Repositories
             record.State = state;
             _context.AcademicRecords.Update(record);
             _context.SaveChanges();
-
             return record;
         }
     }
