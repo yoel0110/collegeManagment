@@ -1,7 +1,7 @@
-﻿using cm.api.Models;
+﻿using cm.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace cm.api.Context
+namespace cm.Infrastructure.Context
 {
     public class AppDbContext: DbContext
     {
