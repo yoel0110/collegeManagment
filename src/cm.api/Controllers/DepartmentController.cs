@@ -1,46 +1,48 @@
-﻿using cm.api.Context;
-using cm.api.Models;
+﻿ 
 using cm.api.Dtos.department;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using cm.api.Dtos;
-
+using cm.Infrastructure.Interfaces;
+using cm.Domain.Entities;
 namespace cm.api.Controllers
 {
     [ApiController]
     [Route("api/v1/department")]
-    public class DepartmentController: ControllerBase
+    public class DepartmentController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IFacultyRepository _facultyRepository;
 
-        public DepartmentController(AppDbContext context)
+        public DepartmentController(IDepartmentRepository departmentRepository, IFacultyRepository facultyRepository)
         {
-            _context = context;
+            _departmentRepository = departmentRepository;
+            _facultyRepository = facultyRepository;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateDeparmentDTO createDeparmentDTO)
+        public IActionResult Create(CreateDeparmentDTO createDeparmentDTO)
         {
-            var faculty = await _context.Faculties.FindAsync(createDeparmentDTO.FacultyId);
+            var faculty = _facultyRepository.GetById(createDeparmentDTO.FacultyId);
 
             if (faculty == null)
             {
-                return StatusCode(404, ApiResponse<Department>.UnSuccessFullResponse("Not found", 404));
+                return StatusCode(404, ApiResponse<Department>.UnSuccessFullResponse("Not found faculty", 404));
             }
-            
-            _context.Departments.Add(new Department { 
+
+            var department = _departmentRepository.Add(new Department
+            {
                 Faculty = faculty,
                 FacultyId = createDeparmentDTO.FacultyId,
                 Name = createDeparmentDTO.Name
             });
 
-           await _context.SaveChangesAsync();
-            return Ok();
+            return StatusCode(201, ApiResponse<Department>.SuccessResponse(department,"Created", 201));
+
         }
         [HttpGet]
         public async Task<ActionResult<List<Department>>> GeAll()
         {
-            var deparments = await _context.Departments.ToListAsync();
+            var deparments = _departmentRepository.GetAll();
             return StatusCode(200, ApiResponse<List<Department>>.SuccessResponse(deparments));
         }
     }

@@ -18,6 +18,8 @@ builder.Services.AddDbContext<AppDbContext>((context) => context.UseSqlServer(co
 builder.Services.AddTransient<IStudentRepository, StudentRepository>();
 builder.Services.AddTransient<IAcedemicRecordRepository, AcedemicRecordRepository>();
 builder.Services.AddTransient<ICatalogCourseRepository, CatalogCourseRepository>();
+builder.Services.AddTransient<IFacultyRepository, FacultyRepository>();
+builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
 
 var app = builder.Build();
 
