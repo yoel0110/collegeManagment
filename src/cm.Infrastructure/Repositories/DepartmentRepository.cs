@@ -20,10 +20,18 @@ namespace cm.Infrastructure.Repositories
             return department;
         }
 
+
+
         public List<Department> GetAll()
         {
             var departments = _context.Departments.ToList();
             return departments;
+        }
+
+        public Department GetById(int id)
+        {
+            var deparment = _context.Departments.Find(id);
+            return deparment;
         }
 
         public Department Update(Department department) {

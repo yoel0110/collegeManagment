@@ -20,6 +20,9 @@ builder.Services.AddTransient<IAcedemicRecordRepository, AcedemicRecordRepositor
 builder.Services.AddTransient<ICatalogCourseRepository, CatalogCourseRepository>();
 builder.Services.AddTransient<IFacultyRepository, FacultyRepository>();
 builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddTransient<IProfessorRepository, ProfesorRepository>();
+builder.Services.AddTransient<IEnrollmentRepository, EnrollmentRepository>();
+
 
 var app = builder.Build();
 

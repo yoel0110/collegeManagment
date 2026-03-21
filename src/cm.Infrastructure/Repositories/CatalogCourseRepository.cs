@@ -27,6 +27,12 @@ namespace cm.Infrastructure.Repositories
             return catalogs;
         }
 
+        public CatalogCourse getById(int id)
+        {
+            var catalog = _context.CatalogCourses.Find(id);
+            return catalog;
+        }
+
         public CatalogCourse Update(CatalogCourse catalogCourse)
         {
             _context.Update(catalogCourse);

@@ -1,9 +1,9 @@
-﻿using cm.api.Context;
-using cm.api.Dtos.professor;
+﻿using cm.api.Dtos.professor;
 using cm.api.Dtos;
-using cm.api.Models;
+using cm.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using cm.Infrastructure.Interfaces;
 
 namespace cm.api.Controllers
 {
@@ -12,18 +12,26 @@ namespace cm.api.Controllers
     public class ProfessorController : ControllerBase
     {
 
-        private readonly AppDbContext _context;
+        private readonly IProfessorRepository _profesorRepository;
+        private readonly IDepartmentRepository _departmentRepository;
+        private readonly IFacultyRepository _facultyRepository;
+        private readonly ICatalogCourseRepository _catalogCourseRepository;
 
-        public ProfessorController(AppDbContext context)
+        public ProfessorController(IProfessorRepository profesorRepository, 
+            IDepartmentRepository departmentRepository, 
+            IFacultyRepository facultyRepository, ICatalogCourseRepository catalogCourseRepository)
         {
-            _context = context;
+            _profesorRepository = profesorRepository;
+            _departmentRepository = departmentRepository;
+            _facultyRepository = facultyRepository;
+            _catalogCourseRepository = catalogCourseRepository;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateProfessorDTO dto)
+        public IActionResult Create(CreateProfessorDTO dto)
         {
-            var department = await _context.Departments.FindAsync(dto.DepartmentId);
-            var catalog = await _context.CatalogCourses.FindAsync(dto.CatalogId);
+            var department = _departmentRepository.GetById(dto.DepartmentId);
+            var catalog = _catalogCourseRepository.getById(dto.CatalogId);
 
             if (department == null && catalog == null)
             {
@@ -42,28 +50,15 @@ namespace cm.api.Controllers
                 CatalogCourse = catalog
             };
 
-            _context.Professors.Add(professor);
-            await _context.SaveChangesAsync();
-
-            //_context.Professors.Add);
-
-            return StatusCode(201,ApiResponse<Professor>.SuccessResponse(professor, statusCode: 201));
+            professor = _profesorRepository.Add(professor);
+            return StatusCode(201, ApiResponse<Professor>.SuccessResponse(professor, statusCode: 201));
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ProfessorDto>>> GetAll()
+        public ActionResult<List<Professor>> GetAll()
         {
-            var professors = await _context.Professors
-                                        .Include(p => p.CatalogCourse)
-                                        .Select(p => new ProfessorDto
-                                        {
-                                            Id = p.ProfessorID,
-                                            FullName = p.FirstName + ' '+ p.LastName,
-                                            CourseName = p.CatalogCourse.Name
-                                        })
-                                        .ToListAsync();
-
-            return StatusCode(200, ApiResponse<List<ProfessorDto>>.SuccessResponse(professors));
+            var professors = _profesorRepository.ListAll();
+            return StatusCode(200, ApiResponse<List<Professor>>.SuccessResponse(professors));
         }
 
     }
