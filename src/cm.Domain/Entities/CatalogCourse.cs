@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-
+ 
 namespace cm.Domain.Entities
 {
     public class CatalogCourse

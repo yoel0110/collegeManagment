@@ -1,9 +1,8 @@
-﻿using cm.api.Context;
-using cm.api.Dtos;
+﻿using cm.api.Dtos;
 using cm.api.Dtos.catalog;
-using cm.api.Models;
+using cm.Domain.Entities;
+using cm.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace cm.api.Controllers
 {
@@ -11,15 +10,15 @@ namespace cm.api.Controllers
     [Route("api/v1/catalog")]
     public class CatalogController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICatalogCourseRepository _catalogCourseRepository;
 
-        public CatalogController(AppDbContext context)
+        public CatalogController(ICatalogCourseRepository catalogCourseRepository)
         {
-            _context = context;
+            _catalogCourseRepository = catalogCourseRepository;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateCatalogDTO dto)
+        public IActionResult Create(CreateCatalogDTO dto)
         {
             var catalog = new CatalogCourse
             {
@@ -29,22 +28,15 @@ namespace cm.api.Controllers
                 SubjectId = 0
             };
 
-            _context.CatalogCourses.Add(catalog);
-
-            await _context.SaveChangesAsync();
-
+           catalog = _catalogCourseRepository.Add(catalog);
             return Ok(ApiResponse<CatalogCourse>.SuccessResponse(catalog, "Created"));
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<CatalogCourse>>> GetAll()
+        public ActionResult<List<CatalogCourse>> GetAll()
         {
-            var catalog = await _context.CatalogCourses.ToListAsync();
-
+            var catalog = _catalogCourseRepository.GetAll();
             return Ok(ApiResponse<List<CatalogCourse>>.SuccessResponse(catalog));
         }
-
     }
-
-
 }

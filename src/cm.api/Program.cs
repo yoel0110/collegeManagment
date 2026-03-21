@@ -17,7 +17,7 @@ var config = builder.Configuration.GetConnectionString("connection");
 builder.Services.AddDbContext<AppDbContext>((context) => context.UseSqlServer(config));
 builder.Services.AddTransient<IStudentRepository, StudentRepository>();
 builder.Services.AddTransient<IAcedemicRecordRepository, AcedemicRecordRepository>();
-
+builder.Services.AddTransient<ICatalogCourseRepository, CatalogCourseRepository>();
 
 var app = builder.Build();
 
