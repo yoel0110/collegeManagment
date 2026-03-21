@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace cm.api.Migrations
+namespace cm.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class FixRelationCatalogcourse : Migration
+    public partial class InstialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,6 +28,21 @@ namespace cm.api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AcademicRecords", x => x.RecordID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CatalogCourses",
+                columns: table => new
+                {
+                    SubjectId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Score = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CatalogCourses", x => x.SubjectId);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,6 +86,36 @@ namespace cm.api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Enrollments",
+                columns: table => new
+                {
+                    EnrollMentID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RecordID = table.Column<int>(type: "int", nullable: false),
+                    AcademicRecordRecordID = table.Column<int>(type: "int", nullable: false),
+                    SubjectId = table.Column<int>(type: "int", nullable: false),
+                    CatalogCourseSubjectId = table.Column<int>(type: "int", nullable: false),
+                    EnrollDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Enrollments", x => x.EnrollMentID);
+                    table.ForeignKey(
+                        name: "FK_Enrollments_AcademicRecords_AcademicRecordRecordID",
+                        column: x => x.AcademicRecordRecordID,
+                        principalTable: "AcademicRecords",
+                        principalColumn: "RecordID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Enrollments_CatalogCourses_CatalogCourseSubjectId",
+                        column: x => x.CatalogCourseSubjectId,
+                        principalTable: "CatalogCourses",
+                        principalColumn: "SubjectId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Departments",
                 columns: table => new
                 {
@@ -102,11 +147,18 @@ namespace cm.api.Migrations
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DepartmentDeparmentId = table.Column<int>(type: "int", nullable: false),
                     Specialty = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CatalogCourseSubjectId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Professors", x => x.ProfessorID);
+                    table.ForeignKey(
+                        name: "FK_Professors_CatalogCourses_CatalogCourseSubjectId",
+                        column: x => x.CatalogCourseSubjectId,
+                        principalTable: "CatalogCourses",
+                        principalColumn: "SubjectId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Professors_Departments_DepartmentDeparmentId",
                         column: x => x.DepartmentDeparmentId,
@@ -114,64 +166,6 @@ namespace cm.api.Migrations
                         principalColumn: "DeparmentId",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "CatalogCourses",
-                columns: table => new
-                {
-                    SubjectId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Score = table.Column<float>(type: "real", nullable: false),
-                    ProfessorID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CatalogCourses", x => x.SubjectId);
-                    table.ForeignKey(
-                        name: "FK_CatalogCourses_Professors_ProfessorID",
-                        column: x => x.ProfessorID,
-                        principalTable: "Professors",
-                        principalColumn: "ProfessorID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Enrollments",
-                columns: table => new
-                {
-                    EnrollMentID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RecordID = table.Column<int>(type: "int", nullable: false),
-                    AcademicRecordRecordID = table.Column<int>(type: "int", nullable: false),
-                    SubjectId = table.Column<int>(type: "int", nullable: false),
-                    CatalogCourseSubjectId = table.Column<int>(type: "int", nullable: false),
-                    EnrollDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Enrollments", x => x.EnrollMentID);
-                    table.ForeignKey(
-                        name: "FK_Enrollments_AcademicRecords_AcademicRecordRecordID",
-                        column: x => x.AcademicRecordRecordID,
-                        principalTable: "AcademicRecords",
-                        principalColumn: "RecordID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Enrollments_CatalogCourses_CatalogCourseSubjectId",
-                        column: x => x.CatalogCourseSubjectId,
-                        principalTable: "CatalogCourses",
-                        principalColumn: "SubjectId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CatalogCourses_ProfessorID",
-                table: "CatalogCourses",
-                column: "ProfessorID",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_FacultyId",
@@ -186,6 +180,11 @@ namespace cm.api.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Enrollments_CatalogCourseSubjectId",
                 table: "Enrollments",
+                column: "CatalogCourseSubjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Professors_CatalogCourseSubjectId",
+                table: "Professors",
                 column: "CatalogCourseSubjectId");
 
             migrationBuilder.CreateIndex(
@@ -206,19 +205,19 @@ namespace cm.api.Migrations
                 name: "Enrollments");
 
             migrationBuilder.DropTable(
+                name: "Professors");
+
+            migrationBuilder.DropTable(
                 name: "Students");
 
             migrationBuilder.DropTable(
                 name: "CatalogCourses");
 
             migrationBuilder.DropTable(
-                name: "AcademicRecords");
-
-            migrationBuilder.DropTable(
-                name: "Professors");
-
-            migrationBuilder.DropTable(
                 name: "Departments");
+
+            migrationBuilder.DropTable(
+                name: "AcademicRecords");
 
             migrationBuilder.DropTable(
                 name: "Faculties");

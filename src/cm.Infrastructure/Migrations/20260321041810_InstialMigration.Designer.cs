@@ -5,27 +5,27 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using cm.api.Context;
+using cm.Infrastructure.Context;
 
 #nullable disable
 
-namespace cm.api.Migrations
+namespace cm.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260318150445_FixRelationCatalogcourse")]
-    partial class FixRelationCatalogcourse
+    [Migration("20260321041810_InstialMigration")]
+    partial class InstialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("cm.api.Models.AcademicRecord", b =>
+            modelBuilder.Entity("cm.Domain.Entities.AcademicRecord", b =>
                 {
                     b.Property<int>("RecordID")
                         .ValueGeneratedOnAdd()
@@ -62,7 +62,7 @@ namespace cm.api.Migrations
                     b.ToTable("AcademicRecords");
                 });
 
-            modelBuilder.Entity("cm.api.Models.CatalogCourse", b =>
+            modelBuilder.Entity("cm.Domain.Entities.CatalogCourse", b =>
                 {
                     b.Property<int>("SubjectId")
                         .ValueGeneratedOnAdd()
@@ -78,21 +78,15 @@ namespace cm.api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProfessorID")
-                        .HasColumnType("int");
-
                     b.Property<float>("Score")
                         .HasColumnType("real");
 
                     b.HasKey("SubjectId");
 
-                    b.HasIndex("ProfessorID")
-                        .IsUnique();
-
                     b.ToTable("CatalogCourses");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Department", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Department", b =>
                 {
                     b.Property<int>("DeparmentId")
                         .ValueGeneratedOnAdd()
@@ -114,7 +108,7 @@ namespace cm.api.Migrations
                     b.ToTable("Departments");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Enrollment", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Enrollment", b =>
                 {
                     b.Property<int>("EnrollMentID")
                         .ValueGeneratedOnAdd()
@@ -150,7 +144,7 @@ namespace cm.api.Migrations
                     b.ToTable("Enrollments");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Faculty", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Faculty", b =>
                 {
                     b.Property<int>("FacultyID")
                         .ValueGeneratedOnAdd()
@@ -167,13 +161,16 @@ namespace cm.api.Migrations
                     b.ToTable("Faculties");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Professor", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Professor", b =>
                 {
                     b.Property<int>("ProfessorID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfessorID"));
+
+                    b.Property<int>("CatalogCourseSubjectId")
+                        .HasColumnType("int");
 
                     b.Property<int>("DepartmentDeparmentId")
                         .HasColumnType("int");
@@ -204,12 +201,14 @@ namespace cm.api.Migrations
 
                     b.HasKey("ProfessorID");
 
+                    b.HasIndex("CatalogCourseSubjectId");
+
                     b.HasIndex("DepartmentDeparmentId");
 
                     b.ToTable("Professors");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Student", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Student", b =>
                 {
                     b.Property<int>("StudentID")
                         .ValueGeneratedOnAdd()
@@ -258,18 +257,9 @@ namespace cm.api.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("cm.api.Models.CatalogCourse", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Department", b =>
                 {
-                    b.HasOne("cm.api.Models.Professor", null)
-                        .WithOne("CatalogCourse")
-                        .HasForeignKey("cm.api.Models.CatalogCourse", "ProfessorID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("cm.api.Models.Department", b =>
-                {
-                    b.HasOne("cm.api.Models.Faculty", "Faculty")
+                    b.HasOne("cm.Domain.Entities.Faculty", "Faculty")
                         .WithMany()
                         .HasForeignKey("FacultyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -278,15 +268,15 @@ namespace cm.api.Migrations
                     b.Navigation("Faculty");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Enrollment", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Enrollment", b =>
                 {
-                    b.HasOne("cm.api.Models.AcademicRecord", "AcademicRecord")
+                    b.HasOne("cm.Domain.Entities.AcademicRecord", "AcademicRecord")
                         .WithMany()
                         .HasForeignKey("AcademicRecordRecordID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("cm.api.Models.CatalogCourse", "CatalogCourse")
+                    b.HasOne("cm.Domain.Entities.CatalogCourse", "CatalogCourse")
                         .WithMany()
                         .HasForeignKey("CatalogCourseSubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -297,32 +287,34 @@ namespace cm.api.Migrations
                     b.Navigation("CatalogCourse");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Professor", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Professor", b =>
                 {
-                    b.HasOne("cm.api.Models.Department", "Department")
+                    b.HasOne("cm.Domain.Entities.CatalogCourse", "CatalogCourse")
+                        .WithMany()
+                        .HasForeignKey("CatalogCourseSubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("cm.Domain.Entities.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentDeparmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CatalogCourse");
+
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("cm.api.Models.Student", b =>
+            modelBuilder.Entity("cm.Domain.Entities.Student", b =>
                 {
-                    b.HasOne("cm.api.Models.AcademicRecord", "AcademicRecord")
+                    b.HasOne("cm.Domain.Entities.AcademicRecord", "AcademicRecord")
                         .WithMany()
                         .HasForeignKey("RecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AcademicRecord");
-                });
-
-            modelBuilder.Entity("cm.api.Models.Professor", b =>
-                {
-                    b.Navigation("CatalogCourse")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
