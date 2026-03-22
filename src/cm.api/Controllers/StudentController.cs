@@ -1,120 +1,110 @@
 ﻿using cm.api.Dtos.student;
 using cm.Domain.Entities;
-using cm.api.Dtos;
-using cm.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using cm.Application.Contract;
 
 namespace cm.api.Controllers
 {
     [ApiController]
     [Route("api/v1/students")]
-    public class StudentController: ControllerBase
+    public class StudentController : ControllerBase
     {
-        private readonly IStudentRepository _repository;
-        private readonly IAcedemicRecordRepository _acedemicRecordRepository;
+        private readonly IStudentService _studentService;
 
-        public StudentController(IStudentRepository repository, IAcedemicRecordRepository acedemicRecordRepository)
+        public StudentController(IStudentService studentService)
         {
-            _acedemicRecordRepository = acedemicRecordRepository;
-            _repository = repository;
+            _studentService = studentService;
         }
+
         [HttpPost]
         public IActionResult CreateStudent(CreateStudentDTO studentDTO)
         {
-            if (studentDTO.AcademicRecord == null) return BadRequest("Record can't be empty");
-
-            string matricula = "M-" + DateTime.Now.Year + "" + DateTime.Now.Day + "" +  _repository.Count();
-            
-            var record = _repository.AddAcademicRecord(new AcademicRecord
+            try
             {
-                Average = 0.0,
-                Carreer = studentDTO.AcademicRecord.Carreer,
-                CurrentPeriod = 0,
-                Matricula = matricula,
-                FacultyId = studentDTO.AcademicRecord.FacultyId,
-                State = "Admitido",
-                YearEnrrollMent = DateOnly.FromDateTime(DateTime.Now),
-            });
-
-            var student =  _repository.Add(new Student
+                var student = _studentService.Register(studentDTO);
+                return StatusCode(201, ApiResponse<Student>.SuccessResponse(student, $"The student with id {student.StudentID} have been created", 201));
+            }
+            catch (Exception ex)
             {
-                FirstName = studentDTO.FirstName,
-                BirthDate = studentDTO.BirthDate,
-                PhoneNumber = studentDTO.PhoneNumber,
-                Adress = studentDTO.Adress,
-                LastName = studentDTO.LastName,
-                Email = studentDTO.Email,
-                Gender = studentDTO.Gender,
-                Nationality = studentDTO.Nationality,
-                RecordId = record.RecordID,
+                return StatusCode(500, ApiResponse<Student>.UnSuccessFullResponse(ex.Message));
+            }
 
-            });
-
-            record.StudentId = student.StudentID;
-            _acedemicRecordRepository.Update(record);
-
-            return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
         }
         [HttpGet]
-        public  ActionResult<ApiResponse<Student>> GetAll()
+        public ActionResult<ApiResponse<Student>> GetAll()
         {
-            var students = _repository.GetStudents();
+            var students = _studentService.GetAllStudents();
             return StatusCode(200, ApiResponse<List<Student>>.SuccessResponse(students, "Ok", 200));
         }
 
         [HttpGet("get-with-id/{id}")]
-        public  ActionResult<Student> GetById(int id)
+        public ActionResult<Student> GetById(int id)
         {
-            var student =  _repository.GetById(id);
-            if (student == null) return NoContent();
+            try
+            {
+                var student = _studentService.GetStudent(id);
+                if (student == null)
+                    return StatusCode(404, ApiResponse<Student>.UnSuccessFullResponse("Estudiante no encontrado"));
 
-            return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
+                return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<Student>.UnSuccessFullResponse(ex.Message));
+
+            }
         }
 
         [HttpGet("get-with-matricula/{matricula}")]
-        public  ActionResult<Student> GetByMatricula(string matricula)
+        public ActionResult<Student> GetByMatricula(string matricula)
         {
-            var student = _repository.GetByMatricula(matricula);
-            if (student == null) return NoContent();
-
-            return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
+            try
+            {
+                var student = _studentService.GetStudentByMatricula(matricula);
+                if (student == null)
+                    return StatusCode(404, ApiResponse<Student>.UnSuccessFullResponse("Estudiante no encontrado"));
+                return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
+            }
+            catch (Exception ex)
+            {
+                {
+                    return StatusCode(500, ApiResponse<Student>.UnSuccessFullResponse(ex.Message));
+                }
+            }
         }
         [HttpPut]
         public ActionResult<Student> Update(UpdateStudentDTO updateStudentDTO)
         {
-            Student? student = _repository.GetById(updateStudentDTO.StudentID);
-            if (student != null)
+            try
             {
-                student.FirstName = updateStudentDTO.FirstName;
-                student.LastName = updateStudentDTO.LastName;
-                student.BirthDate = updateStudentDTO.BirthDate;
-                student.Email = updateStudentDTO.Email;
-                student.PhoneNumber = updateStudentDTO.PhoneNumber;
-                student.Adress = updateStudentDTO.Adress;
-                student.Gender = updateStudentDTO.Gender;
-                student.Nationality = updateStudentDTO.Nationality;
+                if (updateStudentDTO == null)
+                    return StatusCode(400, ApiResponse<Student>.UnSuccessFullResponse("Datos de estudiante no proporcionados"));
 
-                _repository.Update(student);
+                var student = _studentService.UpdateStudent(updateStudentDTO);
+                if (student == null) 
+                    return StatusCode(400, ApiResponse<Student>.UnSuccessFullResponse("Estudiante no he encontrado"));
+
                 return StatusCode(200, ApiResponse<Student>.SuccessResponse(student, statusCode: 200));
+
             }
-            return StatusCode(404, ApiResponse<Student>.SuccessResponse(null, statusCode: 404));
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<Student>.UnSuccessFullResponse(ex.Message));
+            }
         }
-        
+
         [HttpDelete("{matricula}")]
         public ActionResult<AcademicRecord> DeleteByMatricula(string matricula)
         {
-            var student =  _acedemicRecordRepository.GetByMatricula(matricula);
-            student.State = "Canceled";
-            student = _acedemicRecordRepository.Update(student);
-            if (student == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse("Student not found"));      
-            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(student,$"The student with record {student.Matricula} have been removed", 201));
+            var student = _studentService.UpdateStudentState(new UpdateStateStudentStateDTO { Matricula = matricula, State = "Canceled" });
+            if (student == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse("Student not found"));
+            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(student, $"The student with record {student.Matricula} have been removed", 201));
         }
 
         [HttpGet("records/{matricula}")]
         public ActionResult<AcademicRecord> GetRecord(string matricula)
         {
-            var record =  _repository.GetAcademicRecord(matricula);
-
+            var record = _studentService.GetAcademicRecord(matricula);
             if (record == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse(statusCode: 404));
 
             return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(record));
@@ -123,7 +113,7 @@ namespace cm.api.Controllers
         [HttpPut("update-status")]
         public ActionResult<AcademicRecord> UpdateState(UpdateStateStudentStateDTO update)
         {
-            var record = _repository.ChangeState(update.matricula, update.State);
+            var record = _studentService.UpdateStudentState(update);
             return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(record));
         }
     }
