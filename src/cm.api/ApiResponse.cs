@@ -1,4 +1,4 @@
-﻿namespace cm.api.Dtos
+﻿namespace cm.api
 {
     public class ApiResponse<T> where T : class
     {

@@ -1,4 +1,4 @@
-﻿namespace cm.api.Dtos.faculty
+﻿namespace cm.Application.Dtos.faculty
 {
     public class CreateFacultyDTO
     {

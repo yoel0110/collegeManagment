@@ -1,5 +1,5 @@
 ﻿
-namespace cm.api.Dtos.professor
+namespace cm.Application.Dtos.professor
 {
     public class CreateProfessorDTO
     {

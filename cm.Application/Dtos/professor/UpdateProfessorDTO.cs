@@ -1,6 +1,6 @@
 ﻿using cm.Domain.Entities;
 
-namespace cm.api.Dtos.professor
+namespace cm.Application.Dtos.professor
 {
     public class UpdateProfessorDTO
     {

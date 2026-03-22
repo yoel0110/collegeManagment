@@ -1,6 +1,6 @@
 ﻿ 
 
-namespace cm.api.Dtos.catalog
+namespace cm.Application.Dtos.catalog
 {
     public class CreateCatalogDTO
     {

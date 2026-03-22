@@ -1,4 +1,4 @@
-﻿namespace cm.api.Dtos.enrollment
+﻿namespace cm.Application.Dtos.enrollment
 {
     public class CreateEnrollmentDTO
     {

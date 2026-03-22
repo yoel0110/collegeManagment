@@ -1,9 +1,8 @@
-﻿using cm.api.Dtos;
-using cm.api.Dtos.catalog;
+﻿using cm.Application.Dtos.catalog;
 using cm.Domain.Entities;
 using cm.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-
+using cm.api;
 namespace cm.api.Controllers
 {
     [ApiController]

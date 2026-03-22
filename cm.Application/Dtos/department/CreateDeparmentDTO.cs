@@ -1,4 +1,4 @@
-﻿namespace cm.api.Dtos.department
+﻿namespace cm.Application.Dtos.department
 {
     public class CreateDeparmentDTO
     {

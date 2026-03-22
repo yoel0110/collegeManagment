@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace cm.api.Dtos.catalog
+namespace cm.Application.Dto.catalog
 {
     public class UpdateCatalogDTO
     {
