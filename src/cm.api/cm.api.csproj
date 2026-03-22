@@ -18,6 +18,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\cm.Application\cm.Application.csproj" />
+	  <ProjectReference Include="..\cm.Application\cm.Application.csproj" />
 	</ItemGroup>
 
 </Project>
