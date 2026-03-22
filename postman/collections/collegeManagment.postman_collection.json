@@ -1,0 +1,330 @@
+{
+  "info": {
+    "_postman_id": "bb6ee92e-3ed7-4766-90ef-06440a1cbb97",
+    "name": "collegeManagment",
+    "description": "# 🚀 CollegeManagment API\n\nThis collection support (GET, POST, PUT, DELETE), variables.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" width=\"2162\" height=\"1530\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create student",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "7dfcb3be-b2d7-48cc-b623-48c6a6bfe386",
+            "exec": [
+              "pm.test(\"Successful POST request\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "ed7b42e3-0384-4106-9b1c-4c7bba20d2de",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "fe0967d8-ebda-4afb-8396-58c3e30da986",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "accept",
+            "value": "*/*"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Santana\",\n  \"birthDate\": \"2026-02-08\",\n  \"gender\": \"M\",\n  \"email\": \"lebron@test.com\",\n  \"phoneNumber\": \"+1 899 990 8989\",\n  \"adress\": \"In some place\",\n  \"nationality\": \"Dominican\",\n  \"academicRecord\": {\n    \"carreer\": \"Sofware\",\n    \"facultyId\": 1\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/students",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "students"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Update student",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "cafda581-ae69-44cd-9aa3-69545fe731e9",
+            "exec": [
+              "pm.test(\"Successful PUT request\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "81f9900a-c971-436f-8e68-d50b9d5d87ed",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "03d8744d-9e83-4db5-b2b2-cbc4e3714df7",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    /*For update student specify the id in the StudentId field*/\n  \"studentID\": 12,\n  \"firstName\": \"Yoel\",\n  \"lastName\": \"Montero\",\n  \"birthDate\": \"2026-02-09\",\n  \"gender\": \"M\",\n  \"email\": \"lebron@test.com\",\n  \"phoneNumber\": \"+1 990 99 990\",\n  \"adress\": \"Mi casa\",\n  \"nationality\": \"Dominica\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/students",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "students"
+          ]
+        },
+        "description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Student by  Matricula",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "cca613e8-b8c7-43f6-83a2-8a109a488d86",
+            "exec": [
+              "pm.test(\"Successful DELETE request\", function () {",
+              "    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "e0eaf273-51a2-42b6-981d-70eae3bd74de",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "d2743d77-eb78-439a-ada4-177df8c30dae",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "accept",
+            "value": "text/plain"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/students/{{matricula}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "students",
+            "{{matricula}}"
+          ]
+        },
+        "description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "Get all students",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "d2d2d0f5-ec2e-410e-9025-eaf103cd172e",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "723dbbf3-e683-4b3c-99e1-ac64db7aaf84",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "7f304e56-5cd6-4aa6-94d5-422450c3e6f1",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/students",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "students"
+          ]
+        },
+        "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Student By Id",
+      "id": "152dee3d-d658-42b8-9252-30f9fc2b0036",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "text/plain"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/students/get-with-id/{{id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "students",
+            "get-with-id",
+            "{{id}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Record with matricula",
+      "id": "fce9d25e-0df3-43bf-b509-668b45b236f6",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "accept",
+            "value": "text/plain"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/students/records/{{matricula}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "students",
+            "records",
+            "{{matricula}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update student status",
+      "id": "cbd9f470-1cb4-429d-9ca7-2dd31b32751e",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"matricula\": \"{{matricula}}\",\r\n  \"state\": \"Baja\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/students/update-status/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "students",
+            "update-status",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "id": "9fa48d71-a728-459c-806a-c47bb8b20c90",
+      "key": "id",
+      "value": "1"
+    },
+    {
+      "id": "7bfeecfe-08e7-487e-a268-2c4a98e0dfba",
+      "key": "base_url",
+      "value": "https://template.postman-echo.com"
+    },
+    {
+      "id": "8c349a6b-82dc-41ab-9b79-6a335f3f1bda",
+      "key": "matricula",
+      "value": ""
+    }
+  ]
+}

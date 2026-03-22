@@ -1,8 +1,8 @@
-﻿using cm.api.Context;
+﻿using cm.api.Dtos.student;
+using cm.Domain.Entities;
 using cm.api.Dtos;
-using cm.api.Models;
+using cm.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace cm.api.Controllers
 {
@@ -10,20 +10,22 @@ namespace cm.api.Controllers
     [Route("api/v1/students")]
     public class StudentController: ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IStudentRepository _repository;
+        private readonly IAcedemicRecordRepository _acedemicRecordRepository;
 
-        public StudentController(AppDbContext context)
+        public StudentController(IStudentRepository repository, IAcedemicRecordRepository acedemicRecordRepository)
         {
-            _context = context;
+            _acedemicRecordRepository = acedemicRecordRepository;
+            _repository = repository;
         }
         [HttpPost]
-        public async Task<IActionResult> CreateStudent(CreateStudentDTO studentDTO)
+        public IActionResult CreateStudent(CreateStudentDTO studentDTO)
         {
             if (studentDTO.AcademicRecord == null) return BadRequest("Record can't be empty");
 
-            string matricula = "M-" + DateTime.Now.Year + "" + DateTime.Now.Day + "" + ((await _context.Students.CountAsync()) + 1);
+            string matricula = "M-" + DateTime.Now.Year + "" + DateTime.Now.Day + "" +  _repository.Count();
             
-            var record = _context.AcademicRecords.Add(new AcademicRecord
+            var record = _repository.AddAcademicRecord(new AcademicRecord
             {
                 Average = 0.0,
                 Carreer = studentDTO.AcademicRecord.Carreer,
@@ -33,9 +35,8 @@ namespace cm.api.Controllers
                 State = "Admitido",
                 YearEnrrollMent = DateOnly.FromDateTime(DateTime.Now),
             });
-            await _context.SaveChangesAsync();
 
-            var student =  _context.Students.Add(new Student
+            var student =  _repository.Add(new Student
             {
                 FirstName = studentDTO.FirstName,
                 BirthDate = studentDTO.BirthDate,
@@ -45,50 +46,43 @@ namespace cm.api.Controllers
                 Email = studentDTO.Email,
                 Gender = studentDTO.Gender,
                 Nationality = studentDTO.Nationality,
-                RecordId = record.Entity.RecordID,
-            });
-            await _context.SaveChangesAsync();
+                RecordId = record.RecordID,
 
-            return Ok();
+            });
+
+            record.StudentId = student.StudentID;
+            _acedemicRecordRepository.Update(record);
+
+            return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
         }
         [HttpGet]
-        public async Task<ActionResult<List<Student>>> GetAll()
+        public  ActionResult<ApiResponse<Student>> GetAll()
         {
-            var students = await _context.Students
-                                            .Include(s => s.AcademicRecord)
-                                            .ToListAsync();
-            return Ok(students);
+            var students = _repository.GetStudents();
+            return StatusCode(200, ApiResponse<List<Student>>.SuccessResponse(students, "Ok", 200));
         }
 
         [HttpGet("get-with-id/{id}")]
-        public async Task<ActionResult<Student>> GetById(int id)
+        public  ActionResult<Student> GetById(int id)
         {
-            var student = await _context.Students
-                    .Include(s => s.AcademicRecord)
-                    .FirstOrDefaultAsync(s => s.StudentID == id);
-                                            
-
+            var student =  _repository.GetById(id);
             if (student == null) return NoContent();
 
-            return Ok(student);
+            return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
         }
 
         [HttpGet("get-with-matricula/{matricula}")]
-        public async Task<ActionResult<Student>> GetByMatricula(string matricula)
+        public  ActionResult<Student> GetByMatricula(string matricula)
         {
-            var student = await _context.Students
-                    .Include(s => s.AcademicRecord)
-                    .FirstOrDefaultAsync(s => s.AcademicRecord.Matricula == matricula);
-
-
+            var student = _repository.GetByMatricula(matricula);
             if (student == null) return NoContent();
 
-            return Ok(student);
+            return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
         }
         [HttpPut]
-        public async Task<ActionResult<Student>> Update(UpdateStudentDTO updateStudentDTO)
+        public ActionResult<Student> Update(UpdateStudentDTO updateStudentDTO)
         {
-            Student? student = await _context.Students.FindAsync(updateStudentDTO.StudentID);
+            Student? student = _repository.GetById(updateStudentDTO.StudentID);
             if (student != null)
             {
                 student.FirstName = updateStudentDTO.FirstName;
@@ -99,45 +93,38 @@ namespace cm.api.Controllers
                 student.Adress = updateStudentDTO.Adress;
                 student.Gender = updateStudentDTO.Gender;
                 student.Nationality = updateStudentDTO.Nationality;
-                await _context.SaveChangesAsync();
-                return Ok(student);
+
+                _repository.Update(student);
+                return StatusCode(200, ApiResponse<Student>.SuccessResponse(student, statusCode: 200));
             }
-            return NotFound();
+            return StatusCode(404, ApiResponse<Student>.SuccessResponse(null, statusCode: 404));
         }
         
         [HttpDelete("{matricula}")]
-        public async Task<ActionResult<Student>> DeleteByMatricula(string matricula)
+        public ActionResult<AcademicRecord> DeleteByMatricula(string matricula)
         {
-            var student = await _context.Students
-                    .Include(s => s.AcademicRecord)
-                    .FirstOrDefaultAsync(s => s.AcademicRecord.Matricula == matricula);
-
-            if (student == null) return NoContent();
-            _context.Students.Remove(student);
-            _context.AcademicRecords.Remove(student.AcademicRecord);
-            await _context.SaveChangesAsync(); 
-
-            return Ok($"The record matricula {student.AcademicRecord.Matricula} have been removed");
+            var student =  _acedemicRecordRepository.GetByMatricula(matricula);
+            student.State = "Canceled";
+            student = _acedemicRecordRepository.Update(student);
+            if (student == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse("Student not found"));      
+            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(student,$"The student with record {student.Matricula} have been removed", 201));
         }
-        [HttpGet("records/{matricula}")]
-        public async Task<ActionResult<AcademicRecord>> GetRecord(string matricula)
-        {
-            var record = await _context.AcademicRecords.FirstOrDefaultAsync(r =>r.Matricula == matricula);
-                     
-            if (record == null) return NoContent();
 
-            return Ok(record);
+        [HttpGet("records/{matricula}")]
+        public ActionResult<AcademicRecord> GetRecord(string matricula)
+        {
+            var record =  _repository.GetAcademicRecord(matricula);
+
+            if (record == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse(statusCode: 404));
+
+            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(record));
         }
 
         [HttpPut("update-status")]
-        public async Task<ActionResult<AcademicRecord>> UpdateState(UpdateStateStudentStateDTO update)
+        public ActionResult<AcademicRecord> UpdateState(UpdateStateStudentStateDTO update)
         {
-            AcademicRecord? record = await _context.AcademicRecords.
-                    FirstOrDefaultAsync(r => r.Matricula == update.matricula);
-            if (record == null) return NotFound();
-            record.State = update.State;
-            await _context.SaveChangesAsync();
-            return Ok(record);
+            var record = _repository.ChangeState(update.matricula, update.State);
+            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(record));
         }
     }
 }
