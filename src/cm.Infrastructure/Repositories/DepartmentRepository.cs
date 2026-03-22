@@ -31,6 +31,7 @@ namespace cm.Infrastructure.Repositories
         public Department GetById(int id)
         {
             var deparment = _context.Departments.Find(id);
+            if (deparment == null) return null;
             return deparment;
         }
 

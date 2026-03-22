@@ -11,7 +11,5 @@
         public double Average { get; set; }
         public string State { get; set; }
         public int StudentId {  get; set; }
-        public Student Student { get; set; }
-        public ICollection<Enrollment> Enrollment { get; set; }
     }
 }

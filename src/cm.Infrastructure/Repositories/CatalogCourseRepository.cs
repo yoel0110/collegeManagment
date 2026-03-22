@@ -2,6 +2,7 @@
 using cm.Domain.Entities;
 using cm.Infrastructure.Context;
 using cm.Infrastructure.Interfaces;
+using System.Diagnostics;
 
 namespace cm.Infrastructure.Repositories
 {
@@ -30,6 +31,7 @@ namespace cm.Infrastructure.Repositories
         public CatalogCourse getById(int id)
         {
             var catalog = _context.CatalogCourses.Find(id);
+            if (catalog == null) return null;
             return catalog;
         }
 

@@ -7,7 +7,7 @@ namespace cm.Infrastructure.Interfaces
     {
         public Student Add(Student student);
         public Student Update(Student student);
-        public Student DeleteByMatricula(string matricula);
+        public AcademicRecord DeleteByMatricula(string matricula);
         public Student GetById(int id);
         public Student GetByMatricula(string matricula);
         public List<Student> GetStudents();

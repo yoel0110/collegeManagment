@@ -33,11 +33,14 @@ namespace cm.api.Controllers
             var department = _departmentRepository.GetById(dto.DepartmentId);
             var catalog = _catalogCourseRepository.getById(dto.CatalogId);
 
-            if (department == null && catalog == null)
+            if (department == null)
             {
-                return StatusCode(404, ApiResponse<Professor>.UnSuccessFullResponse(message: "Deparment not found.\nCatalog not found."));
+                return StatusCode(404, ApiResponse<Professor>.UnSuccessFullResponse(message: "Deparment not found. "));
             }
-
+            if (catalog == null)
+            {
+                return StatusCode(404, ApiResponse<Professor>.UnSuccessFullResponse(message: "Catalog not found."));
+            }
             var professor = new Professor
             {
                 Email = dto.Email,
@@ -46,7 +49,7 @@ namespace cm.api.Controllers
                 PhoneNumber = dto.PhoneNumber,
                 Specialty = dto.Specialty,
                 Status = dto.Status,
-                Department = department,
+                DepartmentId = dto.DepartmentId,
                 CatalogCourse = new List<CatalogCourse> { catalog }
             };
 

@@ -1,7 +1,6 @@
 ﻿using cm.Domain.Entities;
 using cm.Infrastructure.Context;
 using cm.Infrastructure.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace cm.Infrastructure.Repositories
 {
@@ -38,8 +37,6 @@ namespace cm.Infrastructure.Repositories
         public List<Enrollment> ListAll()
         {
             var enrollments = _context.Enrollments
-                .Include(e => e.AcademicRecord)
-                .Include(e => e.CatalogCourse)
                 .ToList();
             return enrollments;
         }

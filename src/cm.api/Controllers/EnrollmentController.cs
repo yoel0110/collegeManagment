@@ -42,8 +42,6 @@ namespace cm.api.Controllers
                 RecordID = dto.RecordID,
                 SubjectId = dto.SubjectId,
                 Status = dto.Status,
-                AcademicRecord = record,
-                CatalogCourse = new List<CatalogCourse>{catalog}
 
             });
             return StatusCode(200, ApiResponse<Enrollment>.SuccessResponse(null, "Created"));

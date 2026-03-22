@@ -8,9 +8,5 @@ internal class CatalogCourseConfiguration : IEntityTypeConfiguration<CatalogCour
     {
         builder.HasKey(c => c.SubjectId);
 
-        builder
-            .HasOne(c => c.Professor)
-            .WithMany(p => p.CatalogCourse)
-            .HasForeignKey(c => c.ProfesorId);
     }
 }

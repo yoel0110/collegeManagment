@@ -11,9 +11,11 @@ namespace cm.api.Controllers
     public class StudentController: ControllerBase
     {
         private readonly IStudentRepository _repository;
+        private readonly IAcedemicRecordRepository _acedemicRecordRepository;
 
-        public StudentController(IStudentRepository repository)
+        public StudentController(IStudentRepository repository, IAcedemicRecordRepository acedemicRecordRepository)
         {
+            _acedemicRecordRepository = acedemicRecordRepository;
             _repository = repository;
         }
         [HttpPost]
@@ -45,7 +47,11 @@ namespace cm.api.Controllers
                 Gender = studentDTO.Gender,
                 Nationality = studentDTO.Nationality,
                 RecordId = record.RecordID,
+
             });
+
+            record.StudentId = student.StudentID;
+            _acedemicRecordRepository.Update(record);
 
             return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
         }
@@ -69,8 +75,6 @@ namespace cm.api.Controllers
         public  ActionResult<Student> GetByMatricula(string matricula)
         {
             var student = _repository.GetByMatricula(matricula);
-
-
             if (student == null) return NoContent();
 
             return StatusCode(200, ApiResponse<Student>.SuccessResponse(student));
@@ -99,9 +103,11 @@ namespace cm.api.Controllers
         [HttpDelete("{matricula}")]
         public ActionResult<AcademicRecord> DeleteByMatricula(string matricula)
         {
-            var student =  _repository.DeleteByMatricula(matricula);
+            var student =  _acedemicRecordRepository.GetByMatricula(matricula);
+            student.State = "Canceled";
+            student = _acedemicRecordRepository.Update(student);
             if (student == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse("Student not found"));      
-            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(student.AcademicRecord,$"The record matricula {student.AcademicRecord.Matricula} have been removed", 201));
+            return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(student,$"The student with record {student.Matricula} have been removed", 201));
         }
 
         [HttpGet("records/{matricula}")]

@@ -1,7 +1,6 @@
 ﻿using cm.Domain.Entities;
 using cm.Infrastructure.Context;
 using cm.Infrastructure.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace cm.Infrastructure.Repositories
 {
@@ -28,21 +27,12 @@ namespace cm.Infrastructure.Repositories
             return student;
         }
 
-        public Student DeleteByMatricula(string matricula)
+        public AcademicRecord DeleteByMatricula(string matricula)
         {
-            var student = _context.Students
-               .Include(e => e.AcademicRecord)
-               .FirstOrDefault(e => e.AcademicRecord.Matricula == matricula);
-
-            student?.AcademicRecord?.State = "Canceled";
-            if (student != null)
-            {
-                _context.Students.Update(student);
-                _context.SaveChanges();
-                _context.Entry(student).Reload();
-                return student;
-            }
-            return null;
+            var record = _acedemicRecordRepository.GetByMatricula(matricula);
+            record.State = "Canceled";
+            record = _acedemicRecordRepository.Update(record);
+            return record;
         }
 
         public Student GetById(int id)
@@ -58,17 +48,17 @@ namespace cm.Infrastructure.Repositories
 
         public Student GetByMatricula(string matricula)
         {
+            var record = _acedemicRecordRepository.GetByMatricula(matricula);
 
-            var student = _context.Students
-                .Include(e => e.AcademicRecord)
-                .FirstOrDefault(e => e.AcademicRecord.Matricula == matricula);
+            var student = _context.Students.Find(record.StudentId);
+                
+            if (student == null) return null;
             return student;
         }
 
         public List<Student> GetStudents()
         {
             var student = _context.Students
-                .Include(e => e.AcademicRecord)
                 .ToList();
 
             return student;

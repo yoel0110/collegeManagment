@@ -28,7 +28,6 @@ namespace cm.Infrastructure.Repositories
         {
             var profesor = _context.Professors
                                 .Include(p => p.CatalogCourse)
-                                .Include(p => p.Department)
                                 .FirstOrDefault(p => p.ProfessorID == id);
             return profesor;
         }
@@ -38,7 +37,6 @@ namespace cm.Infrastructure.Repositories
         {
             var profesors = _context.Professors
                                 .Include(p => p.CatalogCourse)
-                                .Include(p => p.Department)
                                 .ToList();
             return profesors;
         }

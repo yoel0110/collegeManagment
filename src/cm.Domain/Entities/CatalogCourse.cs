@@ -10,7 +10,5 @@ namespace cm.Domain.Entities
         public float Score { get; set; }
         public int EnrollmentID { get; set; }
         public int ProfesorId { get; set; }    
-        public Professor Professor { get; set; }
-        public Enrollment Enrollment { get; set; }
     }
 }

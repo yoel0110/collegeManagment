@@ -7,10 +7,5 @@ internal class AcademicRecordConfiguration : IEntityTypeConfiguration<AcademicRe
     public void Configure(EntityTypeBuilder<AcademicRecord> builder)
     {
         builder.HasKey(ar => ar.RecordID);
-
-        builder
-            .HasMany(a => a.Enrollment)
-            .WithOne(e => e.AcademicRecord)
-            .HasForeignKey(e => e.RecordID);
     }
 }

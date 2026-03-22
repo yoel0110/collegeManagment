@@ -31,7 +31,6 @@ namespace cm.api.Controllers
 
             var department = _departmentRepository.Add(new Department
             {
-                Faculty = faculty,
                 FacultyId = createDeparmentDTO.FacultyId,
                 Name = createDeparmentDTO.Name
             });

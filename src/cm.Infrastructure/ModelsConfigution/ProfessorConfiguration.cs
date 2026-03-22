@@ -9,7 +9,7 @@ internal class ProfessorConfiguration : IEntityTypeConfiguration<Professor>
         builder.HasKey(p => p.ProfessorID);
 
         builder
-            .HasOne(p => p.Department)
+            .HasOne<Department>()   
             .WithMany(d => d.Professors)
             .HasForeignKey(p => p.DepartmentId);
     }

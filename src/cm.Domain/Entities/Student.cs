@@ -14,6 +14,5 @@ namespace cm.Domain.Entities
         public string Adress { get; set; }
         public string Nationality { get; set; }
         public int RecordId { get; set; }
-        public AcademicRecord? AcademicRecord { get; set; }
     }
 }

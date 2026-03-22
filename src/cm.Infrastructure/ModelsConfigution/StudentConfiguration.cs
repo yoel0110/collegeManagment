@@ -8,9 +8,5 @@ internal class StudentConfiguration : IEntityTypeConfiguration<Student>
     {
         builder.HasKey(s => s.StudentID);
 
-        builder
-            .HasOne(s => s.AcademicRecord)
-            .WithOne(a => a.Student)
-            .HasForeignKey<AcademicRecord>(a => a.StudentId);
     }
 }
