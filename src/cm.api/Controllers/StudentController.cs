@@ -96,7 +96,7 @@ namespace cm.api.Controllers
         [HttpDelete("{matricula}")]
         public ActionResult<AcademicRecord> DeleteByMatricula(string matricula)
         {
-            var student = _studentService.UpdateStudentState(new UpdateStateStudentStateDTO { matricula = matricula, State = "Canceled" });
+            var student = _studentService.UpdateStudentState(new UpdateStateStudentStateDTO { Matricula = matricula, State = "Canceled" });
             if (student == null) return StatusCode(404, ApiResponse<AcademicRecord>.UnSuccessFullResponse("Student not found"));
             return StatusCode(200, ApiResponse<AcademicRecord>.SuccessResponse(student, $"The student with record {student.Matricula} have been removed", 201));
         }

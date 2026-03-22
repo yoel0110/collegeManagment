@@ -148,7 +148,7 @@ namespace cm.Application.Service
 
         public AcademicRecord UpdateStudentState(UpdateStateStudentStateDTO stateStudentStateDTO)
         {
-            var record = _acedemicRecordRepository.GetByMatricula(stateStudentStateDTO.matricula);
+            var record = _acedemicRecordRepository.GetByMatricula(stateStudentStateDTO.Matricula);
             if (record == null) throw new Exception("Academic record not found");
             record.State = stateStudentStateDTO.State;
             _acedemicRecordRepository.Update(record);

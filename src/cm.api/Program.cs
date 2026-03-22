@@ -1,12 +1,12 @@
 using cm.Application.Contract;
 using cm.Application.Contract.cm.Application.Interfaces;
+using cm.Application.Interfaces;
 using cm.Application.Service;
 using cm.Application.Services;
 using cm.Infrastructure.Context;
 using cm.Infrastructure.Interfaces;
 using cm.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +34,8 @@ builder.Services.AddScoped<IProfessorService, ProfessorService>();
 builder.Services.AddScoped<IFacultyService, FacultyService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>(); 
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<ICatalogCourseService, CatalogCourseService>();
+
 
 var app = builder.Build();
 
