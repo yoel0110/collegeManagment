@@ -1,7 +1,6 @@
-﻿using cm.api.Dtos;
-using cm.api.Dtos.faculty;
+﻿using cm.Application.Contract;
+using cm.Application.Dtos.faculty;
 using cm.Domain.Entities;
-using cm.Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cm.api.Controllers
@@ -10,28 +9,25 @@ namespace cm.api.Controllers
     [Route("api/v1/faculty")]
     public class FacultyController : ControllerBase
     {
-        private readonly IFacultyRepository _facultyRepository;
+        private readonly IFacultyService _facultyService;
 
-        public FacultyController(IFacultyRepository facultyRepository)
+        public FacultyController(IFacultyService facultyService)
         {
-            _facultyRepository = facultyRepository;
+            _facultyService = facultyService;
         }
 
         [HttpPost]
         public IActionResult Create(CreateFacultyDTO createFacultyDTO)
         {
-            _facultyRepository.Add(new Faculty { Name = createFacultyDTO.Name });
+            _facultyService.Create(createFacultyDTO);
             return StatusCode(201, ApiResponse<Faculty>.SuccessResponse(null, "Created", 201));
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Faculty>>> GetAll()
+        public ActionResult<List<Faculty>> GetAll()
         {
-            var faculties =  _facultyRepository.GetAll();
-
+            var faculties = _facultyService.GetAll();
             return StatusCode(200, ApiResponse<List<Faculty>>.SuccessResponse(faculties));
         }
-
-
     }
 }

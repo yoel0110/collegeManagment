@@ -1,41 +1,41 @@
 ﻿using cm.Application.Dtos.catalog;
+using cm.Application.Interfaces;
 using cm.Domain.Entities;
-using cm.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using cm.api;
+using Microsoft.AspNetCore.Mvc;
+
 namespace cm.api.Controllers
 {
     [ApiController]
     [Route("api/v1/catalog")]
     public class CatalogController : ControllerBase
     {
-        private readonly ICatalogCourseRepository _catalogCourseRepository;
+        private readonly ICatalogCourseService _catalogCourseService;
 
-        public CatalogController(ICatalogCourseRepository catalogCourseRepository)
+        public CatalogController(ICatalogCourseService catalogCourseService)
         {
-            _catalogCourseRepository = catalogCourseRepository;
+            _catalogCourseService = catalogCourseService;
         }
 
         [HttpPost]
         public IActionResult Create(CreateCatalogDTO dto)
         {
-            var catalog = new CatalogCourse
+            try
             {
-                Code = dto.Code,
-                Name = dto.Name,
-                Score = dto.Score,
-                SubjectId = 0
-            };
-
-           catalog = _catalogCourseRepository.Add(catalog);
-            return Ok(ApiResponse<CatalogCourse>.SuccessResponse(catalog, "Created"));
+                var catalog = _catalogCourseService.Create(dto);
+                return StatusCode(201, ApiResponse<CatalogCourse>.SuccessResponse(catalog, "Created", 201));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<CatalogCourse>.UnSuccessFullResponse(ex.Message));
+            }
         }
 
         [HttpGet]
-        public ActionResult<List<CatalogCourse>> GetAll()
+        public IActionResult GetAll()
         {
-            var catalog = _catalogCourseRepository.GetAll();
-            return Ok(ApiResponse<List<CatalogCourse>>.SuccessResponse(catalog));
+            var catalog = _catalogCourseService.GetAll();
+            return StatusCode(200, ApiResponse<List<CatalogCourse>>.SuccessResponse(catalog));
         }
     }
 }

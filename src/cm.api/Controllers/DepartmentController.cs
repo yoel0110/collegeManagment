@@ -1,48 +1,44 @@
-﻿ 
-using cm.api.Dtos.department;
-using Microsoft.AspNetCore.Mvc;
-using cm.api.Dtos;
-using cm.Infrastructure.Interfaces;
+﻿using cm.Application.Contract;
+using cm.Application.Dtos.department;
 using cm.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
+
 namespace cm.api.Controllers
 {
     [ApiController]
     [Route("api/v1/department")]
     public class DepartmentController : ControllerBase
     {
-        private readonly IDepartmentRepository _departmentRepository;
-        private readonly IFacultyRepository _facultyRepository;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartmentRepository departmentRepository, IFacultyRepository facultyRepository)
+        public DepartmentController(IDepartmentService departmentService)
         {
-            _departmentRepository = departmentRepository;
-            _facultyRepository = facultyRepository;
+            _departmentService = departmentService;
         }
 
         [HttpPost]
-        public IActionResult Create(CreateDeparmentDTO createDeparmentDTO)
+        public IActionResult Create(CreateDeparmentDTO dto)
         {
-            var faculty = _facultyRepository.GetById(createDeparmentDTO.FacultyId);
-
-            if (faculty == null)
+            try
             {
-                return StatusCode(404, ApiResponse<Department>.UnSuccessFullResponse("Not found faculty", 404));
+                var department = _departmentService.Create(dto);
+                return StatusCode(201, ApiResponse<Department>.SuccessResponse(department, "Created", 201));
             }
-
-            var department = _departmentRepository.Add(new Department
+            catch (KeyNotFoundException ex)
             {
-                FacultyId = createDeparmentDTO.FacultyId,
-                Name = createDeparmentDTO.Name
-            });
-
-            return StatusCode(201, ApiResponse<Department>.SuccessResponse(department,"Created", 201));
-
+                return StatusCode(404, ApiResponse<Department>.UnSuccessFullResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<Department>.UnSuccessFullResponse(ex.Message));
+            }
         }
+
         [HttpGet]
-        public async Task<ActionResult<List<Department>>> GeAll()
+        public IActionResult GetAll()
         {
-            var deparments = _departmentRepository.GetAll();
-            return StatusCode(200, ApiResponse<List<Department>>.SuccessResponse(deparments));
+            var departments = _departmentService.GetAll();
+            return StatusCode(200, ApiResponse<List<Department>>.SuccessResponse(departments));
         }
     }
 }

@@ -1,9 +1,7 @@
-﻿using cm.api.Dtos.professor;
-using cm.api.Dtos;
+﻿using cm.Application.Dtos.professor;
 using cm.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using cm.Infrastructure.Interfaces;
+using cm.Application.Contract;
 
 namespace cm.api.Controllers
 {
@@ -12,55 +10,28 @@ namespace cm.api.Controllers
     public class ProfessorController : ControllerBase
     {
 
-        private readonly IProfessorRepository _profesorRepository;
-        private readonly IDepartmentRepository _departmentRepository;
-        private readonly IFacultyRepository _facultyRepository;
-        private readonly ICatalogCourseRepository _catalogCourseRepository;
+        private readonly IProfessorService _professorService;
 
-        public ProfessorController(IProfessorRepository profesorRepository, 
-            IDepartmentRepository departmentRepository, 
-            IFacultyRepository facultyRepository, ICatalogCourseRepository catalogCourseRepository)
+        public ProfessorController(IProfessorService professorService)
         {
-            _profesorRepository = profesorRepository;
-            _departmentRepository = departmentRepository;
-            _facultyRepository = facultyRepository;
-            _catalogCourseRepository = catalogCourseRepository;
+            _professorService = professorService;
         }
 
         [HttpPost]
         public IActionResult Create(CreateProfessorDTO dto)
         {
-            var department = _departmentRepository.GetById(dto.DepartmentId);
-            var catalog = _catalogCourseRepository.getById(dto.CatalogId);
-
-            if (department == null)
+            var professor = _professorService.CreateProfessor(dto);
+            if(professor == null)
             {
-                return StatusCode(404, ApiResponse<Professor>.UnSuccessFullResponse(message: "Deparment not found. "));
+                return StatusCode(404, ApiResponse<Professor>.UnSuccessFullResponse(message: "Not foun catalog/department.", statusCode: 404));
             }
-            if (catalog == null)
-            {
-                return StatusCode(404, ApiResponse<Professor>.UnSuccessFullResponse(message: "Catalog not found."));
-            }
-            var professor = new Professor
-            {
-                Email = dto.Email,
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                PhoneNumber = dto.PhoneNumber,
-                Specialty = dto.Specialty,
-                Status = dto.Status,
-                DepartmentId = dto.DepartmentId,
-                CatalogCourse = new List<CatalogCourse> { catalog }
-            };
-
-            professor = _profesorRepository.Add(professor);
             return StatusCode(201, ApiResponse<Professor>.SuccessResponse(professor, statusCode: 201));
         }
 
         [HttpGet]
         public ActionResult<List<Professor>> GetAll()
         {
-            var professors = _profesorRepository.ListAll();
+            var professors = _professorService.GetProfessors();
             return StatusCode(200, ApiResponse<List<Professor>>.SuccessResponse(professors));
         }
 

@@ -1,57 +1,42 @@
-﻿using cm.api.Dtos.enrollment;
-using cm.api.Dtos;
+﻿using cm.api;
+using cm.Application.Contract.cm.Application.Interfaces;
+using cm.Application.Dtos.enrollment;
 using cm.Domain.Entities;
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using cm.Infrastructure.Interfaces;
 
-namespace cm.api.Controllers
+[ApiController]
+[Route("api/v1/enrollment")]
+public class EnrollmentController : ControllerBase
 {
-    [ApiController]
-    [Route("api/v1/enrollment")]
-    public class EnrollmentController : ControllerBase
+    private readonly IEnrollmentService _enrollmentService;
+
+    public EnrollmentController(IEnrollmentService enrollmentService)
     {
-        private readonly IEnrollmentRepository _enrollmentRepository;
-        private readonly IAcedemicRecordRepository _acedemicRecordRepository;
-        private readonly ICatalogCourseRepository _catalogCourseRepository;
-        public EnrollmentController(IEnrollmentRepository enrollmentRepository, 
-            IAcedemicRecordRepository acedemicRecordRepository,
-            ICatalogCourseRepository catalogCourseRepository)
+        _enrollmentService = enrollmentService;
+    }
+
+    [HttpPost]
+    public IActionResult Create(CreateEnrollmentDTO dto)
+    {
+        try
         {
-            _enrollmentRepository = enrollmentRepository;
-            _acedemicRecordRepository = acedemicRecordRepository;
-            _catalogCourseRepository = catalogCourseRepository;
+            var enrollment = _enrollmentService.EnrollStudent(dto);
+            return StatusCode(201, ApiResponse<Enrollment>.SuccessResponse(enrollment, "Created", 201));
         }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateEnrollmentDTO dto)
+        catch (KeyNotFoundException ex)
         {
-
-            var record = _acedemicRecordRepository.GetById(dto.RecordID);
-            if (record == null)
-                return StatusCode(403, ApiResponse<Enrollment>.SuccessResponse(null, "Record not found."));
-
-            var catalog = _catalogCourseRepository.getById(dto.SubjectId);
-            if (catalog == null)
-                return StatusCode(403, ApiResponse<Enrollment>.SuccessResponse(null, "Catalog not found."));
-
-            _enrollmentRepository.Add(new Enrollment
-            {
-                EnrollDate = dto.EnrollDate,
-                RecordID = dto.RecordID,
-                SubjectId = dto.SubjectId,
-                Status = dto.Status,
-
-            });
-            return StatusCode(200, ApiResponse<Enrollment>.SuccessResponse(null, "Created"));
+            return StatusCode(404, ApiResponse<Enrollment>.UnSuccessFullResponse(ex.Message));
         }
-
-        [HttpGet]
-        public async Task<ActionResult> GetAll()
+        catch (Exception ex)
         {
-            var enrollments = _enrollmentRepository.ListAll();
-            return Ok(ApiResponse<List<Enrollment>>.SuccessResponse(enrollments));
+            return StatusCode(500, ApiResponse<Enrollment>.UnSuccessFullResponse(ex.Message));
         }
+    }
+
+    [HttpGet]
+    public IActionResult GetAll()
+    {
+        var enrollments = _enrollmentService.GetAll();
+        return StatusCode(200, ApiResponse<List<Enrollment>>.SuccessResponse(enrollments));
     }
 }
